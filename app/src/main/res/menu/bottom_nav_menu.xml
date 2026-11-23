@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_movie"
+        android:icon="@drawable/ic_movie"
+        android:title="@string/menu_movie" />
+    <item
+        android:id="@+id/navigation_favorite"
+        android:icon="@drawable/ic_favorite"
+        android:title="@string/menu_favorite" />
+    <item
+        android:id="@+id/navigation_trailer"
+        android:icon="@drawable/ic_trailer"
+        android:title="@string/menu_trailer" />
+</menu>

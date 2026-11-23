@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="grey_app">#80FFFFFF</color>
+    <color name="dark_blue_app">#001A41</color>
+    <color name="black_reborn">#181C21</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="blur_70_gray">#B3EFF1F4</color>
+    <color name="gray_400">#FFBDBDBD</color>
+</resources>
