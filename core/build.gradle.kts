@@ -20,10 +20,10 @@ android {
         minSdk = 24
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val baseUrl = localProperties.getProperty("BASE_URL")
+        val baseUrl = (localProperties.getProperty("BASE_URL") ?: System.getenv("BASE_URL"))
             ?.let { if (it.startsWith("\"") && it.endsWith("\"")) it else "\"$it\"" }
 
-        val token = localProperties.getProperty("TOKEN")
+        val token = (localProperties.getProperty("TOKEN") ?: System.getenv("TOKEN"))
             ?.let { if (it.startsWith("\"") && it.endsWith("\"")) it else "\"$it\"" }
 
         buildConfigField("String", "BASE_URL", baseUrl.orEmpty())

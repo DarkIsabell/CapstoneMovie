@@ -1,0 +1,44 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@2.5.0
+
+jobs:
+  build-and-test:
+    executor:
+      name: android/android-machine
+      resource-class: medium
+      tag: 2024.01.1
+    steps:
+      - checkout
+      - restore_cache:
+          key: gradle-v1-{{ checksum "build.gradle.kts" }}-{{ checksum "app/build.gradle.kts" }}-{{ checksum "core/build.gradle.kts" }}
+      - run:
+          name: Setup local.properties with BASE_URL and TOKEN
+          command: |
+            echo "BASE_URL=\"$BASE_URL\"" >> local.properties
+            echo "TOKEN=\"$TOKEN\"" >> local.properties
+      - run:
+          name: Chmod permissions
+          command: sudo chmod +x ./gradlew
+      - run:
+          name: Build APK
+          command: ./gradlew assembleDebug --stacktrace
+      - run:
+          name: Run Unit Tests
+          command: ./gradlew testDebugUnitTest --stacktrace
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+          key: gradle-v1-{{ checksum "build.gradle.kts" }}-{{ checksum "app/build.gradle.kts" }}-{{ checksum "core/build.gradle.kts" }}
+      - store_artifacts:
+          path: app/build/outputs/apk/debug/app-debug.apk
+          destination: app-debug.apk
+      - store_test_results:
+          path: app/build/test-results
+
+workflows:
+  build-pipeline:
+    jobs:
+      - build-and-test
