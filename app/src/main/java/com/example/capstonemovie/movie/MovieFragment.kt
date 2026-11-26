@@ -16,10 +16,10 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.capstonemovie.R
 import com.example.capstonemovie.databinding.FragmentMovieBinding
 import com.example.capstonemovie.movie.adapter.MovieAdapter
+import com.example.capstonemovie.movie.model.MovieUiModel
 import com.example.capstonemovie.movie.viewmodel.MovieViewModel
 import com.example.capstonemovie.moviedetail.DetailMovieActivity
-import com.example.core.data.source.Resource
-import com.example.core.domain.model.MovieDomain
+import com.example.core.domain.utils.Resource
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.abs
 
@@ -32,7 +32,7 @@ class MovieFragment : Fragment() {
     private val movieAdapter by lazy { MovieAdapter() }
     private val handler = Handler(Looper.getMainLooper())
 
-    private var currentDataList: List<MovieDomain> = emptyList()
+    private var currentDataList: List<MovieUiModel> = emptyList()
     private var actualSize = 0
     private var size = 0
 
@@ -52,15 +52,17 @@ class MovieFragment : Fragment() {
                 ViewPager2.SCROLL_STATE_DRAGGING -> {
                     stopAutoScroll()
                 }
+
                 ViewPager2.SCROLL_STATE_IDLE -> {
                     stopAutoScroll()
                     startAutoScroll()
-                    if (actualSize > 0) {
+                    if (actualSize >= 2) {
                         when (binding.vpVideoHighlight.currentItem) {
                             size - 1 -> binding.vpVideoHighlight.setCurrentItem(
                                 if (actualSize == 2) 2 else 1,
                                 false
                             )
+
                             0 -> binding.vpVideoHighlight.setCurrentItem(
                                 size - if (actualSize == 2) 3 else 2,
                                 false
@@ -68,6 +70,7 @@ class MovieFragment : Fragment() {
                         }
                     }
                 }
+
                 else -> {}
             }
         }
@@ -75,7 +78,11 @@ class MovieFragment : Fragment() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             if (currentDataList.isNotEmpty() && actualSize > 0) {
-                val index = (position - 1 + actualSize) % actualSize
+                val index = if (actualSize >= 2) {
+                    (position - 1 + actualSize) % actualSize
+                } else {
+                    position
+                }
                 if (index in currentDataList.indices) {
                     binding.tvTitle.text = currentDataList[index].title
                 }
@@ -113,32 +120,49 @@ class MovieFragment : Fragment() {
 
                     is Resource.Error -> {
                         binding.pbMovie.visibility = View.GONE
+                        binding.viewError.root.visibility = View.VISIBLE
                     }
                 }
             }
         }
     }
 
-    private fun setupVideoHighlight(list: List<MovieDomain>) {
+    private fun setupVideoHighlight(list: List<MovieUiModel>) {
+        val isInitialLoad = currentDataList.isEmpty()
         currentDataList = list
         setupInfinite(list)
-        val initialItem = if (list.size >= 2) 1 else 0
-        binding.vpVideoHighlight.setCurrentItem(initialItem, false)
-        if (list.isNotEmpty()) {
-            binding.tvTitle.text = list.first().title
+        if (isInitialLoad) {
+            val initialItem = if (list.size >= 2) 1 else 0
+            binding.vpVideoHighlight.setCurrentItem(initialItem, false)
+            if (list.isNotEmpty()) {
+                binding.tvTitle.text = list.first().title
+            }
+        } else {
+            val currentPos = binding.vpVideoHighlight.currentItem
+            if (list.isNotEmpty() && actualSize > 0) {
+                val index = if (actualSize >= 2) {
+                    (currentPos - 1 + actualSize) % actualSize
+                } else {
+                    currentPos
+                }
+                if (index in list.indices) {
+                    binding.tvTitle.text = list[index].title
+                }
+            }
         }
         stopAutoScroll()
         startAutoScroll()
     }
 
-    private fun setupInfinite(dataList: List<MovieDomain>) {
+    private fun setupInfinite(dataList: List<MovieUiModel>) {
         actualSize = dataList.size
         if (dataList.size >= 3) {
             val newListClick = listOf(dataList.last()) + dataList + listOf(dataList.first())
             size = newListClick.size
             movieAdapter.submitList(newListClick)
         } else if (dataList.size == 2) {
-            val newListClick = listOf(dataList.last()) + dataList + listOf(dataList.first()) + listOf(dataList.last())
+            val newListClick =
+                listOf(dataList.last()) + dataList + listOf(dataList.first()) + listOf(dataList.last())
             size = newListClick.size
             movieAdapter.submitList(newListClick)
         } else {
@@ -146,13 +170,13 @@ class MovieFragment : Fragment() {
             movieAdapter.submitList(dataList)
         }
         movieAdapter.setOnItemClickCallback(object : MovieAdapter.OnItemClickCallback {
-            override fun onItemClicked(data: MovieDomain) {
+            override fun onItemClicked(data: MovieUiModel) {
                 navigateToDetail(data)
             }
         })
     }
 
-    private fun navigateToDetail(movie: MovieDomain) {
+    private fun navigateToDetail(movie: MovieUiModel) {
         val intent = Intent(requireContext(), DetailMovieActivity::class.java)
         intent.putExtra(EXTRA_MOVIE, movie)
         startActivity(intent)

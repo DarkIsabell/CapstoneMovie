@@ -1,8 +1,8 @@
 package com.example.core.domain.usecase
 
-import com.example.core.data.source.Resource
-import com.example.core.domain.model.MovieTrailerDomain
 import com.example.core.domain.model.MovieDomain
+import com.example.core.domain.model.MovieTrailerDomain
+import com.example.core.domain.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface MovieUseCase {

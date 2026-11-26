@@ -8,10 +8,11 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.core.data.source.Resource
+import com.example.core.domain.utils.Resource
 import com.example.trailer.databinding.FragmentTrailerBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
 
 class TrailerFragment : Fragment() {
 
@@ -24,6 +25,11 @@ class TrailerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loadKoinModules(trailerModule)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unloadKoinModules(trailerModule)
     }
 
     override fun onCreateView(

@@ -4,9 +4,10 @@ import com.example.core.data.source.local.LocalDataSource
 import com.example.core.data.source.remote.RemoteDataSource
 import com.example.core.data.source.remote.network.ApiResponse
 import com.example.core.data.source.remote.response.MovieResponse
-import com.example.core.domain.model.MovieTrailerDomain
 import com.example.core.domain.model.MovieDomain
+import com.example.core.domain.model.MovieTrailerDomain
 import com.example.core.domain.repository.MovieRepository
+import com.example.core.domain.utils.Resource
 import com.example.core.utils.AppExecutors
 import com.example.core.utils.DataMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,7 +63,7 @@ class MovieRepositoryImp(
                 remoteDataSource.getMovieTrailers(movies).map { response ->
                     when (response) {
                         is ApiResponse.Success -> Resource.Success(response.data)
-                        is ApiResponse.Empty -> Resource.Error("")
+                        is ApiResponse.Empty -> Resource.Error("Empty Data")
                         is ApiResponse.Error -> Resource.Error(response.errorMessage)
                     }
                 }

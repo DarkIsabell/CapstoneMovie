@@ -8,7 +8,8 @@ import com.example.core.utils.clickWithDebounce
 import com.example.trailer.databinding.ItemTrailerBinding
 
 class TrailerAdapter : BaseListAdapter<MovieTrailerDomain, ItemTrailerBinding>(
-    ItemTrailerBinding::inflate
+    inflaterFactory = ItemTrailerBinding::inflate,
+    areItemsTheSame = { oldItem, newItem -> oldItem.videoPath == newItem.videoPath }
 ) {
 
     private var onItemClickCallback: OnItemClickCallback? = null
@@ -19,12 +20,12 @@ class TrailerAdapter : BaseListAdapter<MovieTrailerDomain, ItemTrailerBinding>(
 
 
     override fun onItemBind(): (MovieTrailerDomain, ItemTrailerBinding, View, Int) -> Unit =
-        { item, binding, itemView, _ ->
+        { item, binding, _, _ ->
             binding.ivTrailer.load(item.thumbnailPath)
             binding.tvTitle.text = item.title
 
 
-            itemView.clickWithDebounce {
+            binding.ivPlay.clickWithDebounce {
                 onItemClickCallback?.onItemClicked(item.videoPath)
             }
         }

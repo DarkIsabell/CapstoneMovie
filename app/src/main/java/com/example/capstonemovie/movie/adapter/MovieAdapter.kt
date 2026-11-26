@@ -2,14 +2,14 @@ package com.example.capstonemovie.movie.adapter
 
 import android.view.View
 import com.example.capstonemovie.databinding.ItemMovieHighlightBinding
+import com.example.capstonemovie.movie.model.MovieUiModel
 import com.example.capstonemovie.utils.view.BaseListAdapter
 import com.example.capstonemovie.utils.view.load
-import com.example.core.domain.model.MovieDomain
 import com.example.core.utils.clickWithDebounce
-import com.example.core.utils.toShortMonth
 
-class MovieAdapter : BaseListAdapter<MovieDomain, ItemMovieHighlightBinding>(
-    ItemMovieHighlightBinding::inflate
+class MovieAdapter : BaseListAdapter<MovieUiModel, ItemMovieHighlightBinding>(
+    inflaterFactory = ItemMovieHighlightBinding::inflate,
+    areItemsTheSame = { oldItem, newItem -> oldItem.id == newItem.id }
 ) {
 
     private lateinit var onItemClickCallback: OnItemClickCallback
@@ -19,11 +19,11 @@ class MovieAdapter : BaseListAdapter<MovieDomain, ItemMovieHighlightBinding>(
     }
 
 
-    override fun onItemBind(): (MovieDomain, ItemMovieHighlightBinding, View, Int) -> Unit =
+    override fun onItemBind(): (MovieUiModel, ItemMovieHighlightBinding, View, Int) -> Unit =
         { item, binding, itemView, _ ->
-            binding.tvRelease.text = item.releaseDate.toShortMonth()
-            binding.tvRating.text = item.voteAverage.toString()
-            binding.tvAdult.text = item.adult
+            binding.tvRelease.text = item.releaseDate
+            binding.tvRating.text = item.rating
+            binding.tvAdult.text = item.labelAdult
             binding.ivMovie.load(item.posterPath)
 
             itemView.clickWithDebounce {
@@ -33,6 +33,6 @@ class MovieAdapter : BaseListAdapter<MovieDomain, ItemMovieHighlightBinding>(
 
 
     interface OnItemClickCallback {
-        fun onItemClicked(data: MovieDomain)
+        fun onItemClicked(data: MovieUiModel)
     }
 }

@@ -3,13 +3,13 @@ package com.example.core.utils
 import com.example.core.data.source.local.entity.MovieEntity
 import com.example.core.data.source.remote.response.MovieResponse
 import com.example.core.data.source.remote.response.MovieVideoResponse
-import com.example.core.domain.model.MovieTrailerDomain
 import com.example.core.domain.model.MovieDomain
+import com.example.core.domain.model.MovieTrailerDomain
 
 object DataMapper {
     fun mapResponsesToEntities(input: List<MovieResponse.NowMovie>): List<MovieEntity> {
         val movieList = ArrayList<MovieEntity>()
-        input.map {
+        input.forEach {
             val movie = MovieEntity(
                 id = it.id.orZero(),
                 title = it.title.orEmpty(),
@@ -36,7 +36,13 @@ object DataMapper {
             adult = it.adult,
             posterPath = it.poster,
             backdropPath = it.backdrop,
-            isFavorite = it.isFavorite
+            isFavorite = it.isFavorite,
+            genreIds = emptyList(),
+            originalLanguage = "",
+            originalTitle = "",
+            popularity = 0.0,
+            video = false,
+            voteCount = 0
         )
     }
 
@@ -51,19 +57,6 @@ object DataMapper {
         backdrop = input.backdropPath,
         isFavorite = input.isFavorite
     )
-
-    fun mapTrailerResponsesToDomain(
-        title: String,
-        input: List<MovieVideoResponse.MovieVideoItem>
-    ): List<MovieTrailerDomain> {
-        return input.map { item ->
-            MovieTrailerDomain(
-                title = title,
-                videoPath = YoutubeHelper.getVideoUrl(item.key),
-                thumbnailPath = YoutubeHelper.getThumbnailUrl(item.key)
-            )
-        }
-    }
 
     fun mapTrailerResponsesToDomainAs(
         title: String,

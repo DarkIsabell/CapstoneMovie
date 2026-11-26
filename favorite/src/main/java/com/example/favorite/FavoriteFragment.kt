@@ -8,11 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.capstonemovie.movie.MovieFragment.Companion.EXTRA_MOVIE
+import com.example.capstonemovie.movie.model.MovieUiModel
 import com.example.capstonemovie.moviedetail.DetailMovieActivity
-import com.example.core.domain.model.MovieDomain
 import com.example.favorite.databinding.FragmentFavoriteBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
 
 class FavoriteFragment : Fragment() {
 
@@ -26,6 +27,11 @@ class FavoriteFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loadKoinModules(favoriteModule)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unloadKoinModules(favoriteModule)
     }
 
     override fun onCreateView(
@@ -60,13 +66,13 @@ class FavoriteFragment : Fragment() {
 
         favoriteAdapter.setOnItemClickCallback(object :
             FavoriteAdapter.OnItemClickCallback {
-            override fun onItemClicked(data: MovieDomain) {
+            override fun onItemClicked(data: MovieUiModel) {
                 navigateToDetail(data)
             }
         })
     }
 
-    private fun navigateToDetail(movie: MovieDomain) {
+    private fun navigateToDetail(movie: MovieUiModel) {
         val intent = Intent(requireContext(), DetailMovieActivity::class.java)
         intent.putExtra(EXTRA_MOVIE, movie)
         startActivity(intent)

@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
 abstract class BaseListAdapter<T : Any, VB : ViewBinding>(
-    private val inflaterFactory: (LayoutInflater, ViewGroup?, Boolean) -> VB
-) : ListAdapter<T, BaseListAdapter.BaseViewHolder<T, VB>>(BaseItemCallback<T>()) {
+    private val inflaterFactory: (LayoutInflater, ViewGroup?, Boolean) -> VB,
+    areItemsTheSame: (T, T) -> Boolean = { oldItem, newItem -> oldItem == newItem }
+) : ListAdapter<T, BaseListAdapter.BaseViewHolder<T, VB>>(BaseItemCallback(areItemsTheSame)) {
     abstract fun onItemBind(): (T, VB, View, Int) -> Unit
     protected open fun onPartialViewBind(): (T, VB, View, Int) -> Unit = { _, _, _, _ -> }
 
@@ -59,9 +60,11 @@ abstract class BaseListAdapter<T : Any, VB : ViewBinding>(
         }
     }
 
-    class BaseItemCallback<T : Any> : DiffUtil.ItemCallback<T>() {
+    class BaseItemCallback<T : Any>(
+        private val areItemsTheSameImpl: (T, T) -> Boolean
+    ) : DiffUtil.ItemCallback<T>() {
         override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
-            return oldItem.toString() == newItem.toString()
+            return areItemsTheSameImpl(oldItem, newItem)
         }
 
         @SuppressLint("DiffUtilEquals")
